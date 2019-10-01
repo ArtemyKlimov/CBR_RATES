@@ -1,0 +1,75 @@
+BROKER SCHEMA net.artemy.cbrrates
+DECLARE SOAP_ENV_NS 	NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
+DECLARE CBR_NS			NAMESPACE 'http://web.cbr.ru/';
+
+CREATE COMPUTE MODULE GetRates_CreateWSRequest
+	DECLARE CBR_WS_URL EXTERNAL CHAR '';
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		DECLARE inRef REFERENCE TO InputRoot.JSON.Data;
+		DECLARE requestDate CHAR inRef.Date;
+		CALL SaveDataToEnvironment(requestDate);
+		CALL CreateWSRequestMessage(requestDate);
+		SET OutputLocalEnvironment.Destination.HTTP.RequestURL =  CBR_WS_URL;
+		RETURN TRUE;
+	END;
+
+
+CREATE PROCEDURE SaveDataToEnvironment(IN requestDate CHAR)
+BEGIN
+	SET Environment.Variables.RequestDate = requestDate;
+	SET Environment.Variables.MsgId = InputRoot.MQMD.MsgId;
+END;
+
+CREATE PROCEDURE SetHttpHeaders()
+BEGIN
+	SET OutputRoot.HTTPRequestHeader."Content-Type" = 'text/xml;charset=UTF-8';
+	SET OutputRoot.HTTPRequestHeader.SOAPAction 	= 'http://web.cbr.ru/GetCursOnDateXML';
+END;
+	
+CREATE PROCEDURE CreateWSRequestMessage(IN requestDate CHAR)
+BEGIN
+	CALL SetHttpHeaders();
+	SET OutputRoot.Properties = InputRoot.Properties;
+	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	DECLARE outRef REFERENCE TO OutputRoot.XMLNSC;
+	CREATE LASTCHILD OF outRef AS outRef NAMESPACE SOAP_ENV_NS NAME 'Envelope';
+	SET outRef.(XMLNSC.NamespaceDecl)xmlns:soapenv = SOAP_ENV_NS;
+	CREATE LASTCHILD OF outRef NAMESPACE SOAP_ENV_NS NAME 'Header';
+	CREATE LASTCHILD OF outRef AS outRef NAMESPACE SOAP_ENV_NS NAME 'Body';
+	CREATE LASTCHILD OF outRef AS outRef NAMESPACE CBR_NS NAME 'GetCursOnDateXML';
+	SET outRef.CBR_NS:On_date = requestDate;
+END;
+	
+END MODULE;
+
+
+CREATE COMPUTE MODULE GetRates_ProcessHTTPSuccess
+	DECLARE CB_WS_URL EXTERNAL CHAR '';
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		RETURN TRUE;
+	END;
+
+END MODULE;
+
+CREATE COMPUTE MODULE GetRates_SaveIntoCache
+	DECLARE CB_WS_URL EXTERNAL CHAR '';
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		RETURN TRUE;
+	END;
+
+END MODULE;
+
+CREATE COMPUTE MODULE GetRates_ProcessHTTPError
+	DECLARE CB_WS_URL EXTERNAL CHAR '';
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		RETURN TRUE;
+	END;
+
+END MODULE;

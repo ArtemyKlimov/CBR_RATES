@@ -1,0 +1,21 @@
+BROKER SCHEMA net.artemy.cbrrates
+
+
+CREATE COMPUTE MODULE DeliverRates_CreateWSRequest
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		-- CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE DeliverRates_ProcessHTTPError
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		-- CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+END MODULE;

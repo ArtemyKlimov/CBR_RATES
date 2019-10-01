@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmMQInput.msgnode="ComIbmMQInput.msgnode" xmlns:common_ErrorHandler.subflow="common/ErrorHandler.subflow" xmlns:common_Logger.subflow="common/Logger.subflow" xmlns:common_WSCaller.subflow="common/WSCaller.subflow" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility"
+    nsURI="net/artemy/cbrrates/DeliverRates.msgflow" nsPrefix="net_artemy_cbrrates_DeliverRates.msgflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1">
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.SOME_WS_URL" name="SOME_WS_URL">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" key="DeliverRates" bundleName="net/artemy/cbrrates/DeliverRates" pluginId="CBR_RATES_APPL"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/CBR_RATES_APPL/icons/full/obj16/DeliverRates.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/CBR_RATES_APPL/icons/full/obj30/DeliverRates.gif"/>
+    <composition>
+      <nodes xmi:type="ComIbmMQInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="71,93" queueName="CBR_RATES.DELIVER_RATES.Q" messageDomainProperty="JSON">
+        <translation xmi:type="utility:ConstantString" string="MQInput"/>
+      </nodes>
+      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_2" location="160,93" level1Pattern="${CURRENT_TIMESTAMP} ${Root.MQMD.MsgId}" level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP} ${Root.MQMD.MsgId} ${Root.JSON.Data.Date}" level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
+        <translation xmi:type="utility:ConstantString" string="EnterLog"/>
+      </nodes>
+      <nodes xmi:type="common_ErrorHandler.subflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="150,162">
+        <translation xmi:type="utility:ConstantString" string="ErrorHandler"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="255,93" computeExpression="esql://routine/net.artemy.cbrrates#DeliverRates_CreateWSRequest.Main">
+        <translation xmi:type="utility:ConstantString" string="CreateWSRequest"/>
+      </nodes>
+      <nodes xmi:type="common_WSCaller.subflow:FCMComposite_1" xmi:id="FCMComposite_1_5" location="379,94" MessageDomain="BLOB">
+        <translation xmi:type="utility:ConstantString" string="WSCaller"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="492,98" computeExpression="esql://routine/net.artemy.cbrrates#DeliverRates_ProcessHTTPError.Main">
+        <translation xmi:type="utility:ConstantString" string="ProcessHTTPError"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.catch" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_6" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.Output1" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer>
+      <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.SOME_WS_URL">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.SOME_WS_URL" bundleName="net/artemy/cbrrates/DeliverRates" pluginId="CBR_RATES_APPL"/>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>
