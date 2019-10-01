@@ -1,0 +1,16 @@
+BROKER SCHEMA net.artemy.timer
+
+
+CREATE COMPUTE MODULE Initiator_CreateRequest
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'MQMD';
+		SET OutputRoot.MQMD.CodedCharSetId = 1208;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'JSON';
+		CREATE LASTCHILD OF OutputRoot.JSON NAME 'Data';
+		SET OutputRoot.JSON.Data.Date = CAST(CURRENT_DATE AS CHAR FORMAT common.getWSDateFormat());
+				
+		RETURN TRUE;
+	END;
+
+END MODULE;
