@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmWSRequest.msgnode="ComIbmWSRequest.msgnode" xmlns:common_Logger.subflow="common/Logger.subflow" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" nsURI="common/WSCaller.subflow" nsPrefix="common_WSCaller.subflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1" useDefaults="true" udpSupport="true">
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.HTTPmethod" name="HTTPmethod" lowerBound="1" defaultValueLiteral="POST">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.WS_URL" name="WS_URL" lowerBound="1" defaultValueLiteral="http://localhost">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.MessageDomain" name="MessageDomain">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.HTTPError.logLevel" name="HTTPError.logLevel" lowerBound="1" defaultValueLiteral="2">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.HTTPError.logPath" name="HTTPError.logPath">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.HTTPFailure.logLevel" name="HTTPFailure.logLevel" lowerBound="1" defaultValueLiteral="2">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.HTTPFailure.logPath" name="HTTPFailure.logPath">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.HTTPSuccess.logLevel" name="HTTPSuccess.logLevel" lowerBound="1" defaultValueLiteral="2">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.HTTPSuccess.logPath" name="HTTPSuccess.logPath">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" key="WSCaller" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/UTILS_LIBR/icons/full/obj16/WSCaller.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/UTILS_LIBR/icons/full/obj30/WSCaller.gif"/>
+    <composition>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input" location="39,79">
+        <translation xmi:type="utility:TranslatableString" key="InTerminal.Input" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Output" location="417,79">
+        <translation xmi:type="utility:TranslatableString" key="OutTerminal.SuccessOut" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+      </nodes>
+      <nodes xmi:type="ComIbmWSRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="150,79" URLSpecifier="http://" httpVersion="1.1" protocol="TLS">
+        <translation xmi:type="utility:ConstantString" string="HTTPRequest"/>
+      </nodes>
+      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_2" location="235,20" level1Pattern="${CURRENT_TIMESTAMP} ${Environment.Variables.MsgId} ${Environment.Variables.RequestDate} replyCode: ${Root.HTTPResponseHeader.&quot;X-Original-HTTP-Status-Code&quot;}&#xD;&#xA;${ExceptionList}" level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP} ${Environment.Variables.MsgId} ${Environment.Variables.RequestDate} replyCode: ${Root.HTTPResponseHeader.&quot;X-Original-HTTP-Status-Code&quot;}&#xD;&#xA;${Root}&#xD;&#xA;${ExceptionList}"
+          level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
+        <translation xmi:type="utility:ConstantString" string="HTTPFailureLog"/>
+      </nodes>
+      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="242,142" level1Pattern="${CURRENT_TIMESTAMP} ${Environment.Variables.MsgId} ${Environment.Variables.RequestDate} replyCode: ${Root.HTTPResponseHeader.&quot;X-Original-HTTP-Status-Code&quot;}" level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP} ${Environment.Variables.MsgId} ${Environment.Variables.RequestDate} replyCode: ${Root.HTTPResponseHeader.&quot;X-Original-HTTP-Status-Code&quot;}&#xD;&#xA;${Root}"
+          level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
+        <translation xmi:type="utility:ConstantString" string="HTTPErrorLog"/>
+      </nodes>
+      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_4" location="300,79" level1Pattern="${CURRENT_TIMESTAMP} ${Environment.Variables.MsgId} ${Environment.Variables.RequestDate}" level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP} ${Environment.Variables.MsgId} ${Environment.Variables.RequestDate}&#xD;&#xA;${Root}" level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
+        <translation xmi:type="utility:ConstantString" string="HTTPSuccessLog"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Output1" location="426,142">
+        <translation xmi:type="utility:TranslatableString" key="OutTerminal.ErrorOut" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="400,20" computeExpression="esql://routine/common#WSCaller_ProcessHTTPFailure.Main">
+        <translation xmi:type="utility:ConstantString" string="ProcessHTTPFailure"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_1" sourceNode="InTerminal.Input" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.error" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="OutTerminal.Output1" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" targetNode="OutTerminal.Output" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer>
+      <propertyDescriptor groupName="Group.WS" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.HTTPMethodEditor" describedAttribute="Property.HTTPmethod">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.HTTPmethod" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+        <propertyDescriptor groupName="Group.WS" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.URLPropertyEditor" configurable="true" describedAttribute="Property.WS_URL">
+          <propertyName xmi:type="utility:TranslatableString" key="Property.WS_URL" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+          <propertyDescriptor groupName="Group.WS" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.MRMessageDomainPropertyEditor" describedAttribute="Property.MessageDomain">
+            <propertyName xmi:type="utility:TranslatableString" key="Property.MessageDomain" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+            <propertyDescriptor groupName="Group.LOG" configurable="true" userDefined="true" describedAttribute="Property.HTTPError.logLevel">
+              <propertyName xmi:type="utility:TranslatableString" key="Property.HTTPError.logLevel" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+              <propertyDescriptor groupName="Group.LOG" configurable="true" describedAttribute="Property.HTTPError.logPath">
+                <propertyName xmi:type="utility:TranslatableString" key="Property.HTTPError.logPath" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+                <propertyDescriptor groupName="Group.LOG" configurable="true" userDefined="true" describedAttribute="Property.HTTPFailure.logLevel">
+                  <propertyName xmi:type="utility:TranslatableString" key="Property.HTTPFailure.logLevel" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+                  <propertyDescriptor groupName="Group.LOG" configurable="true" describedAttribute="Property.HTTPFailure.logPath">
+                    <propertyName xmi:type="utility:TranslatableString" key="Property.HTTPFailure.logPath" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+                    <propertyDescriptor groupName="Group.LOG" configurable="true" userDefined="true" describedAttribute="Property.HTTPSuccess.logLevel">
+                      <propertyName xmi:type="utility:TranslatableString" key="Property.HTTPSuccess.logLevel" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+                      <propertyDescriptor groupName="Group.LOG" configurable="true" describedAttribute="Property.HTTPSuccess.logPath">
+                        <propertyName xmi:type="utility:TranslatableString" key="Property.HTTPSuccess.logPath" bundleName="common/WSCaller" pluginId="UTILS_LIBR"/>
+                      </propertyDescriptor>
+                    </propertyDescriptor>
+                  </propertyDescriptor>
+                </propertyDescriptor>
+              </propertyDescriptor>
+            </propertyDescriptor>
+          </propertyDescriptor>
+        </propertyDescriptor>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <attributeLinks promotedAttribute="Property.HTTPmethod" overriddenNodes="FCMComposite_1_1">
+      <overriddenAttribute href="ComIbmWSRequest.msgnode#Property.httpMethod"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.WS_URL" overriddenNodes="FCMComposite_1_1">
+      <overriddenAttribute href="ComIbmWSRequest.msgnode#Property.URLSpecifier"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.MessageDomain" overriddenNodes="FCMComposite_1_1">
+      <overriddenAttribute href="ComIbmWSRequest.msgnode#Property.messageDomainProperty"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.HTTPError.logLevel" overriddenNodes="FCMComposite_1_3">
+      <overriddenAttribute href="common/Logger.subflow#Property.logLevel"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.HTTPError.logPath" overriddenNodes="FCMComposite_1_3">
+      <overriddenAttribute href="common/Logger.subflow#Property.logPath"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.HTTPFailure.logLevel" overriddenNodes="FCMComposite_1_2">
+      <overriddenAttribute href="common/Logger.subflow#Property.logLevel"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.HTTPFailure.logPath" overriddenNodes="FCMComposite_1_2">
+      <overriddenAttribute href="common/Logger.subflow#Property.logPath"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.HTTPSuccess.logLevel" overriddenNodes="FCMComposite_1_4">
+      <overriddenAttribute href="common/Logger.subflow#Property.logLevel"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.HTTPSuccess.logPath" overriddenNodes="FCMComposite_1_4">
+      <overriddenAttribute href="common/Logger.subflow#Property.logPath"/>
+    </attributeLinks>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>

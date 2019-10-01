@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmMQOutput.msgnode="ComIbmMQOutput.msgnode" xmlns:ComIbmThrow.msgnode="ComIbmThrow.msgnode" xmlns:common_Logger.subflow="common/Logger.subflow" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" nsURI="common/ErrorHandler.subflow" nsPrefix="common_ErrorHandler.subflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1" useDefaults="true" udpSupport="true">
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.ErrorQName" name="ErrorQName">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.logPath" name="logPath">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.WS_REQUEST_DELAY" name="WS_REQUEST_DELAY" lowerBound="1" defaultValueLiteral="5">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.MAX_RETRY_COUNT" name="MAX_RETRY_COUNT" lowerBound="1" defaultValueLiteral="3">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" key="ErrorHandler" bundleName="common/ErrorHandler" pluginId="UTILS_LIBR"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/UTILS_LIBR/icons/full/obj16/ErrorHandler.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/UTILS_LIBR/icons/full/obj30/ErrorHandler.gif"/>
+    <composition>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input" location="20,20">
+        <translation xmi:type="utility:TranslatableString" key="InTerminal.Input" bundleName="common/ErrorHandler" pluginId="UTILS_LIBR"/>
+      </nodes>
+      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_1" location="107,20" level1Pattern="${CURRENT_TIMESTAMP} ${Root.MQMD.MsgId} &#xD;&#xA;${ExceptionList}" level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP} ${Root.MQMD.MsgId} &#xD;&#xA;${Root}&#xD;&#xA;${ExceptionList}" level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
+        <translation xmi:type="utility:ConstantString" string="ErrorLog"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="204,20" computeExpression="esql://routine/common#ErrorHandler_ProcessError.Main">
+        <translation xmi:type="utility:ConstantString" string="ProcessError"/>
+      </nodes>
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="320,108">
+        <translation xmi:type="utility:ConstantString" string="MQOutError"/>
+      </nodes>
+      <nodes xmi:type="ComIbmThrow.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="327,21" messageText="Throw exception to force rollback">
+        <translation xmi:type="utility:ConstantString" string="Throw"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_1" sourceNode="InTerminal.Input" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.out2" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer>
+      <propertyDescriptor groupName="Group.Basic" propertyEditor="com.ibm.etools.mft.ibmnodes.editors.mq.MQQueueNameEditor" configurable="true" describedAttribute="Property.ErrorQName">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.ErrorQName" bundleName="common/ErrorHandler" pluginId="UTILS_LIBR"/>
+        <propertyDescriptor groupName="Group.Basic" configurable="true" describedAttribute="Property.logPath">
+          <propertyName xmi:type="utility:TranslatableString" key="Property.logPath" bundleName="common/Logger" pluginId="common"/>
+          <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.WS_REQUEST_DELAY">
+            <propertyName xmi:type="utility:TranslatableString" key="Property.WS_REQUEST_DELAY" bundleName="common/ErrorHandler" pluginId="UTILS_LIBR"/>
+            <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.MAX_RETRY_COUNT">
+              <propertyName xmi:type="utility:TranslatableString" key="Property.MAX_RETRY_COUNT" bundleName="common/ErrorHandler" pluginId="UTILS_LIBR"/>
+            </propertyDescriptor>
+          </propertyDescriptor>
+        </propertyDescriptor>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <attributeLinks promotedAttribute="Property.ErrorQName" overriddenNodes="FCMComposite_1_3">
+      <overriddenAttribute href="ComIbmMQOutput.msgnode#Property.queueName"/>
+    </attributeLinks>
+    <attributeLinks promotedAttribute="Property.logPath" overriddenNodes="FCMComposite_1_1">
+      <overriddenAttribute href="common/Logger.subflow#Property.logPath"/>
+    </attributeLinks>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>

@@ -1,0 +1,73 @@
+BROKER SCHEMA common
+
+
+
+CREATE PROCEDURE getExceptionInfo(IN ref REFERENCE, INOUT code CHARACTER, INOUT descr CHARACTER, INOUT trace CHARACTER, INOUT usrCode CHARACTER)
+BEGIN
+		WHILE (FIELDNAME(ref) <> 'Insert')AND(LASTMOVE(ref)) DO
+			MOVE ref LASTCHILD;
+		END WHILE;
+		
+		DECLARE traceRef REFERENCE TO ref;
+		MOVE traceRef PARENT;
+		CALL getExceptionTrace(traceRef, trace);
+		
+		MOVE ref PREVIOUSSIBLING;  
+		DECLARE refVal CHAR FIELDVALUE(ref);
+		  
+		IF LENGTH(TRANSLATE(refVal, '01234567890')) = 0 THEN
+			-- msg from backut to failure
+			SET code = refVal;
+			MOVE ref NEXTSIBLING;
+			SET descr = FIELDVALUE(ref);		  
+		ELSE 
+		   
+			DECLARE tmpRef REFERENCE TO ref;
+			MOVE tmpRef PARENT;   
+			IF (FIELDVALUE(tmpRef.Text) = 'User generated exception') THEN  -- throw user exception values(code, text)
+		    	-- thrown from source
+		    	SET usrCode = FIELDVALUE(tmpRef.Number);
+		    	SET code = FIELDVALUE(ref.Text);
+		    	MOVE ref NEXTSIBLING;
+		    	SET descr = FIELDVALUE(ref.Text);
+		       
+		   	ELSE
+		    	IF refVal = 'User exception thrown by throw node' THEN
+		     		MOVE ref PREVIOUSSIBLING;
+		     		SET code = FIELDVALUE(ref);
+		     		MOVE ref NEXTSIBLING;
+		     
+		     		MOVE ref NEXTSIBLING;  
+		     		SET descr = FIELDVALUE(ref.Text);    
+		    	ELSE
+		     		MOVE ref NEXTSIBLING;
+		     		SET descr = '';
+		     		WHILE (FIELDNAME(ref) = 'Insert')AND(LASTMOVE(ref)) DO
+		      			SET descr = descr || FIELDVALUE(ref.Text) || ' | ';
+		      			MOVE ref PREVIOUSSIBLING;
+		     		END WHILE;
+		     		MOVE ref PARENT;
+		     		SET descr = FIELDVALUE(ref.Text) || ' | ' || descr;
+		     		SET code = FIELDVALUE(ref.Number);
+		    	END IF;  
+		   	END IF; 
+		END IF;    
+END;
+
+CREATE PROCEDURE getExceptionTrace(IN ref REFERENCE, INOUT trace CHARACTER) 
+BEGIN
+	SET trace = FIELDNAME(ref) || ':' || CAST(COALESCE(FIELDVALUE(ref), '') AS CHARACTER) || '';
+	MOVE ref FIRSTCHILD;
+	WHILE LASTMOVE(ref) DO
+		SET trace = trace || FIELDNAME(ref) || ':' || CAST(COALESCE(FIELDVALUE(ref), '') AS CHARACTER) || '';
+		IF FIELDNAME(ref) = 'Insert' THEN
+			DECLARE ptr REFERENCE TO ref;
+			MOVE ptr FIRSTCHILD;
+			WHILE LASTMOVE(ptr) DO
+				SET trace = trace || FIELDNAME(ptr) || ':' || CAST(COALESCE(FIELDVALUE(ptr), '') AS CHARACTER) || '';
+				MOVE ptr NEXTSIBLING;
+			END WHILE;
+		END IF;
+		MOVE ref NEXTSIBLING;
+	END WHILE;
+END;

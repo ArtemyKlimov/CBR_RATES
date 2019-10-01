@@ -1,0 +1,25 @@
+BROKER SCHEMA common
+
+
+CREATE COMPUTE MODULE ErrorHandler_ProcessError
+	DECLARE WS_REQUEST_DELAY EXTERNAL 	INT 0;
+	DECLARE MAX_RETRY_COUNT EXTERNAL 	INT 0;
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		DECLARE errorCode CHARACTER '';
+		DECLARE errorTrace CHARACTER '';
+		DECLARE messageText CHARACTER '';
+		DECLARE usrCode CHARACTER '';
+		CALL getExceptionInfo(InputExceptionList.*[1],errorCode, messageText, errorTrace, usrCode);
+		
+		DECLARE backoutCount INTEGER InputRoot.MQMD.BackoutCount;
+		IF backoutCount < MAX_RETRY_COUNT AND usrCode = '3002' THEN
+			DECLARE sleepSuccess BOOLEAN;
+			SET sleepSuccess = SLEEP(WS_REQUEST_DELAY * 1000);
+			PROPAGATE TO TERMINAL 'out1' MESSAGE InputRoot; -- retry
+			RETURN FALSE; 
+		END IF;
+		PROPAGATE TO TERMINAL 'out2' MESSAGE InputRoot;
+		RETURN FALSE;
+	END;
+END MODULE;
