@@ -1,4 +1,5 @@
 BROKER SCHEMA net.artemy.cbrrates
+DECLARE RATES			SHARED ROW;
 DECLARE SOAP_ENV_NS 	NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
 DECLARE CBR_NS			NAMESPACE 'http://web.cbr.ru/';
 
@@ -6,6 +7,9 @@ CREATE COMPUTE MODULE GetRates_CreateWSRequest
 	DECLARE CBR_WS_URL EXTERNAL CHAR '';
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
+		IF NOT EXISTS(RATES.*[]) THEN
+			CALL GetLastCallRates();
+		END IF;
 		DECLARE inRef REFERENCE TO InputRoot.JSON.Data;
 		DECLARE requestDate CHAR inRef.Date;
 		CALL SaveDataToEnvironment(requestDate);
@@ -14,6 +18,13 @@ CREATE COMPUTE MODULE GetRates_CreateWSRequest
 		RETURN TRUE;
 	END;
 
+
+CREATE PROCEDURE GetLastCallRates()
+BEGIN
+	SET OutputRoot.Properties = InputRoot.Properties;
+	CREATE LASTCHILD OF OutputRoot DOMAIN 'MQMD';
+	SET OutputRoot.MQMD.CorrelId = CAST('111111111111111111111111' AS BLOB CCSID 1208);
+END;
 
 CREATE PROCEDURE SaveDataToEnvironment(IN requestDate CHAR)
 BEGIN
@@ -48,8 +59,29 @@ CREATE COMPUTE MODULE GetRates_ProcessHTTPSuccess
 	DECLARE CB_WS_URL EXTERNAL CHAR '';
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
+		DECLARE inRef REFERENCE TO InputRoot.XMLNSC.SOAP_ENV_NS:Envelope.SOAP_ENV_NS:Body.*:GetCursOnDateXMLResponse.*:GetCursOnDateXMLResult;
+		DECLARE valueDateRef 	REFERENCE TO inRef.*:ValuteData;
+		DECLARE wsResultDate	CHAR valueDateRef.(XMLNSC.Attribute)"OnDate";
+		DECLARE onDate			CHAR CAST(CAST(wsResultDate AS DATE FORMAT 'yyyyMMdd') AS CHAR FORMAT common.getWSDateFormat());
+		DECLARE cursRef			REFERENCE TO valueDateRef;
+		MOVE cursRef 			FIRSTCHILD TYPE XMLNSC.Element;
 		
-		RETURN TRUE;
+		IF LASTMOVE(cursRef) THEN
+			DECLARE tmpRef 			REFERENCE TO cursRef;
+			SET RATES.ON_DATE		= onDate;
+			CREATE LASTCHILD OF RATES NAME 'CURRENCIES';
+			WHILE LASTMOVE(cursRef) DO
+				CREATE LASTCHILD OF RATES.CURRENCIES AS tmpRef NAME 'ITEM';
+				SET tmpRef.NAME 	= cursRef.VchCode;
+				SET tmpRef.Value 	= CASE COALESCE(cursRef.Vnom, '') WHEN '' THEN cursRef.Vcurs WHEN '0' THEN cursRef.Vcurs ELSE ROUND(CAST(cursRef.Vcurs AS DECIMAL) / CAST(cursRef.Vnom AS INT), 5) END;
+				MOVE cursRef NEXTSIBLING NAME 'ValuteCursOnDate';
+			END WHILE;
+		
+		END IF;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		SET OutputRoot.XMLNSC.RATES = RATES;
+		PROPAGATE TO TERMINAL 'out3';
+		RETURN FALSE;
 	END;
 
 END MODULE;

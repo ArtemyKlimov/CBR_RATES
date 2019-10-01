@@ -34,10 +34,10 @@
       <nodes xmi:type="ComIbmResetContentDescriptor.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="437,176" messageDomain="XMLNSC" resetMessageDomain="true">
         <translation xmi:type="utility:ConstantString" string="ResetXMLNSC"/>
       </nodes>
-      <nodes xmi:type="ComIbmMQGet.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_10" location="634,27" queueName="CBR_RATES.BUFFER.Q" messageDomainProperty="XMLNSC" getWithCorrelID="true">
+      <nodes xmi:type="ComIbmMQGet.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_10" location="356,21" queueName="CBR_RATES.BUFFER.Q" messageDomainProperty="XMLNSC" getWithCorrelID="true">
         <translation xmi:type="utility:ConstantString" string="GetLastCallRates"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="781,23" computeExpression="esql://routine/net.artemy.cbrrates#GetRates_SaveIntoCache.Main">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="508,17" computeExpression="esql://routine/net.artemy.cbrrates#GetRates_SaveIntoCache.Main">
         <translation xmi:type="utility:ConstantString" string="SaveIntoCache"/>
       </nodes>
       <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_12" location="651,172" queueName="CBR_RATES.BUFFER.Q">
@@ -46,13 +46,13 @@
       <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_13" location="659,98" queueName="CBR_RATES.DELIVER_RATES.Q" persistenceMode="yes">
         <translation xmi:type="utility:ConstantString" string="MQOut"/>
       </nodes>
-      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_14" location="795,102" logPath="/BROKER1/LOGS/CBR_RATES/GetRates_Exit.txt">
+      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_14" location="795,102" logPath="/BROKER1/LOGS/CBR_RATES/GetRates_Exit.txt" level1Pattern="${CURRENT_TIMESTAMP} ${Root.MQMD.MsgId} " level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP} ${Root.MQMD.MsgId} &#xD;&#xA;${Root}" level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
         <translation xmi:type="utility:ConstantString" string="ExitLog"/>
       </nodes>
       <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_15" location="778,176" logPath="/BROKER1/LOGS/CBR_RATES/GetRates_RenewBuffer.txt">
         <translation xmi:type="utility:ConstantString" string="RenewBufferLog"/>
       </nodes>
-      <nodes xmi:type="ComIbmFileOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_16" location="305,187" outputDirectory="C:\BROKER1\LOGS\CBR_RATES" outputFilename="Request.xml" writeMode="writeInPlace">
+      <nodes xmi:type="ComIbmFileOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_17" location="305,187" outputDirectory="C:\BROKER1\LOGS\CBR_RATES" outputFilename="Request.xml" writeMode="writeInPlace">
         <translation xmi:type="utility:ConstantString" string="FileOutput"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.Input"/>
@@ -61,13 +61,13 @@
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.Output1" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" targetNode="FCMComposite_1_8" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
-      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_11" targetNode="FCMComposite_1_11" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_12" targetNode="FCMComposite_1_12" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.out2" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_13" targetNode="FCMComposite_1_13" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.out3" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_14" targetNode="FCMComposite_1_14" sourceNode="FCMComposite_1_13" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.Input"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_15" targetNode="FCMComposite_1_15" sourceNode="FCMComposite_1_12" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.Input"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_17" targetNode="FCMComposite_1_6" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_18" targetNode="FCMComposite_1_10" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
     </composition>
     <propertyOrganizer>
       <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.CBR_WS_URL">
