@@ -1,0 +1,3 @@
+# ESQL files will always have LF endings
+*.esql text eol=lf
+*.esql text eol=lf
