@@ -2,6 +2,7 @@ BROKER SCHEMA net.artemy.cbrrates
 DECLARE RATES			SHARED ROW;
 DECLARE SOAP_ENV_NS 	NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
 DECLARE CBR_NS			NAMESPACE 'http://web.cbr.ru/';
+DECLARE UNIQUE_CORREL_ID BLOB CAST('111111111111111111111111' AS BLOB CCSID 1208);
 
 CREATE COMPUTE MODULE GetRates_CreateWSRequest
 	DECLARE CBR_WS_URL EXTERNAL CHAR '';
@@ -12,6 +13,12 @@ CREATE COMPUTE MODULE GetRates_CreateWSRequest
 		END IF;
 		DECLARE inRef REFERENCE TO InputRoot.JSON.Data;
 		DECLARE requestDate CHAR inRef.Date;
+		DECLARE lastCallDate CHAR COALESCE(RATES.ON_DATE, '');
+		IF lastCallDate <> '' AND lastCallDate = requestDate THEN
+			SET Environment.Variables.Message = 'Данные на ' || lastCallDate || ' уже были отправлены';
+			PROPAGATE TO LABEL 'FINISH';
+			RETURN FALSE; --> Если ранее уже за данную дату отправлялись курсы, то второй раз не отправляем
+		END IF;
 		CALL SaveDataToEnvironment(requestDate);
 		CALL CreateWSRequestMessage(requestDate);
 		SET OutputLocalEnvironment.Destination.HTTP.RequestURL =  CBR_WS_URL;
@@ -21,9 +28,13 @@ CREATE COMPUTE MODULE GetRates_CreateWSRequest
 
 CREATE PROCEDURE GetLastCallRates()
 BEGIN
+	IF (NOT EXISTS(OutputRoot.Properties[])) THEN
+			CREATE FIRSTCHILD OF OutputRoot DOMAIN 'Properties';
+	END IF;
 	SET OutputRoot.Properties = InputRoot.Properties;
 	CREATE LASTCHILD OF OutputRoot DOMAIN 'MQMD';
-	SET OutputRoot.MQMD.CorrelId = CAST('111111111111111111111111' AS BLOB CCSID 1208);
+	SET OutputRoot.MQMD.CorrelId = UNIQUE_CORREL_ID;
+	PROPAGATE TO TERMINAL 'out1';
 END;
 
 CREATE PROCEDURE SaveDataToEnvironment(IN requestDate CHAR)
@@ -40,6 +51,9 @@ END;
 	
 CREATE PROCEDURE CreateWSRequestMessage(IN requestDate CHAR)
 BEGIN
+	IF (NOT EXISTS(OutputRoot.Properties[])) THEN
+		CREATE FIRSTCHILD OF OutputRoot DOMAIN 'Properties';
+	END IF;
 	CALL SetHttpHeaders();
 	SET OutputRoot.Properties = InputRoot.Properties;
 	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -56,48 +70,105 @@ END MODULE;
 
 
 CREATE COMPUTE MODULE GetRates_ProcessHTTPSuccess
-	DECLARE CB_WS_URL EXTERNAL CHAR '';
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		DECLARE inRef REFERENCE TO InputRoot.XMLNSC.SOAP_ENV_NS:Envelope.SOAP_ENV_NS:Body.*:GetCursOnDateXMLResponse.*:GetCursOnDateXMLResult;
 		DECLARE valueDateRef 	REFERENCE TO inRef.*:ValuteData;
 		DECLARE wsResultDate	CHAR valueDateRef.(XMLNSC.Attribute)"OnDate";
 		DECLARE onDate			CHAR CAST(CAST(wsResultDate AS DATE FORMAT 'yyyyMMdd') AS CHAR FORMAT common.getWSDateFormat());
+		DECLARE lastCallDate	CHAR COALESCE(RATES.ON_DATE, '');
+		IF lastCallDate = onDate THEN
+			SET Environment.Variables.Message = 'Данные на ' || lastCallDate || ' уже были отправлены';
+			PROPAGATE TO LABEL 'FINISH';
+			RETURN FALSE;
+		END IF;
+		
 		DECLARE cursRef			REFERENCE TO valueDateRef;
 		MOVE cursRef 			FIRSTCHILD TYPE XMLNSC.Element;
 		
 		IF LASTMOVE(cursRef) THEN
+			CREATE LASTCHILD OF Environment.Variables NAME 'NewRates';
+			DECLARE newRatesRef REFERENCE TO Environment.Variables.NewRates;
 			DECLARE tmpRef 			REFERENCE TO cursRef;
-			SET RATES.ON_DATE		= onDate;
-			CREATE LASTCHILD OF RATES NAME 'CURRENCIES';
+			SET newRatesRef.ON_DATE		= onDate;
+			CREATE LASTCHILD OF newRatesRef NAME 'CURRENCIES';
 			WHILE LASTMOVE(cursRef) DO
-				CREATE LASTCHILD OF RATES.CURRENCIES AS tmpRef NAME 'ITEM';
+				CREATE LASTCHILD OF newRatesRef.CURRENCIES AS tmpRef NAME 'ITEM';
+				DECLARE rate		CHAR CASE COALESCE(cursRef.Vnom, '') WHEN '' THEN cursRef.Vcurs WHEN '0' THEN cursRef.Vcurs ELSE CAST(ROUND(CAST(cursRef.Vcurs AS DECIMAL) / CAST(cursRef.Vnom AS INT), 5) AS CHAR) END;
+				CALL SendOutMessage(onDate ,cursRef.VchCode, rate);
 				SET tmpRef.NAME 	= cursRef.VchCode;
-				SET tmpRef.Value 	= CASE COALESCE(cursRef.Vnom, '') WHEN '' THEN cursRef.Vcurs WHEN '0' THEN cursRef.Vcurs ELSE ROUND(CAST(cursRef.Vcurs AS DECIMAL) / CAST(cursRef.Vnom AS INT), 5) END;
+				SET tmpRef.Value 	= rate;
 				MOVE cursRef NEXTSIBLING NAME 'ValuteCursOnDate';
 			END WHILE;
-		
+			--После отправки всех курсов обновляем буффер и кэш
+			MOVE newRatesRef TO Environment.Variables.NewRates;
+			CALL RenewBufferMessage(newRatesRef);
+			
+
+		ELSE 
+			SET Environment.Variables.Message = 'Данные за ' || onDate || ' не были предоставлены ЦБ';
+			PROPAGATE TO LABEL 'FINISH';
 		END IF;
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		SET OutputRoot.XMLNSC.RATES = RATES;
-		PROPAGATE TO TERMINAL 'out3';
 		RETURN FALSE;
+	END;
+	
+	
+	CREATE PROCEDURE RenewBufferMessage(IN newRatesRef REFERENCE)
+	BEGIN
+		IF (NOT EXISTS(OutputRoot.Properties[])) THEN
+			CREATE FIRSTCHILD OF OutputRoot DOMAIN 'Properties';
+		END IF;		
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'MQMD';
+		SET OutputRoot.MQMD.CodedCharSetId = 1208;
+		SET OutputRoot.MQMD.CorrelId = UNIQUE_CORREL_ID;
+
+		PROPAGATE TO TERMINAL 'out2';
+	END;
+	
+	CREATE PROCEDURE SendOutMessage(IN onDate CHAR, IN currency CHAR, IN rate CHAR)
+	BEGIN
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'MQMD';
+		SET OutputRoot.MQMD.CodedCharSetId = 1208;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'JSON';
+		CREATE LASTCHILD OF OutputRoot.JSON NAME 'Data';
+		DECLARE outRef REFERENCE TO OutputRoot.JSON.Data;
+		SET outRef.Date 	=	onDate;
+		SET outRef.Currency =	currency;
+		SET outRef.Rate 	=	rate;
+		PROPAGATE TO TERMINAL 'out3';	
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE GetRates_RenewCache
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'MQMD';
+		SET OutputRoot.MQMD.CodedCharSetId = 1208;
+		SET OutputRoot.MQMD.CorrelId = UNIQUE_CORREL_ID;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		DECLARE newRatesRef REFERENCE TO Environment.Variables.NewRates;
+		SET OutputRoot.XMLNSC.RATES = newRatesRef;
+		PROPAGATE TO TERMINAL 'out1';
+		SET RATES VALUE = NULL;
+		SET RATES = newRatesRef;
 	END;
 
 END MODULE;
 
 CREATE COMPUTE MODULE GetRates_SaveIntoCache
-	DECLARE CB_WS_URL EXTERNAL CHAR '';
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		
-		RETURN TRUE;
+		DECLARE inRef 			REFERENCE TO InputRoot.XMLNSC;
+		MOVE inRef TO inRef.RATES;
+		IF LASTMOVE(inRef) THEN
+			SET RATES = inRef;
+		END IF;
+		RETURN FALSE;
 	END;
 
 END MODULE;
 
 CREATE COMPUTE MODULE GetRates_ProcessHTTPError
-	DECLARE CB_WS_URL EXTERNAL CHAR '';
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		

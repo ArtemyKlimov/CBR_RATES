@@ -2,10 +2,12 @@ BROKER SCHEMA net.artemy.cbrrates
 
 
 CREATE COMPUTE MODULE DeliverRates_CreateWSRequest
+	DECLARE SOME_WS_URL EXTERNAL CHAR '';
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		-- CALL CopyMessageHeaders();
-		-- CALL CopyEntireMessage();
+		SET OutputLocalEnvironment.Destination.HTTP.RequestURL =  SOME_WS_URL;
+		SET Environment.Variables.MsgId = InputRoot.MQMD.MsgId;
+		SET Environment.Variables.RequestDate = InputRoot.JSON.Data.Date;
 		RETURN TRUE;
 	END;
 END MODULE;
@@ -14,8 +16,7 @@ END MODULE;
 CREATE COMPUTE MODULE DeliverRates_ProcessHTTPError
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		-- CALL CopyMessageHeaders();
-		-- CALL CopyEntireMessage();
+		
 		RETURN TRUE;
 	END;
 END MODULE;
