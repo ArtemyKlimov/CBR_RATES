@@ -1,0 +1,2 @@
+Для вызова standalone-заглушек необходимо использовать wiremock-standalone-2.12.0.jar, запустив его, например, командой:
+java -jar wiremock-standalone-2.12.0.jar --port 9128 --max-request-journal-entries 1000

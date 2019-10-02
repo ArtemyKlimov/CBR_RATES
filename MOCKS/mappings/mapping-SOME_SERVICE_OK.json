@@ -1,0 +1,21 @@
+{
+  "id" : "73298e32-a96a-4ef4-b1cf-9fc11d694570",
+  "priority": 2,
+  "request" : {
+    "url" : "/SetRates",
+    "method" : "POST"
+	
+	
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-SOME_SERVICE_OK.json",
+    "headers" : {
+      "X-Powered-By" : "Servlet/3.1",
+      "Content-Type" : "text/xml; charset=UTF-8",
+      "Content-Language" : "en-US",
+      "Date" : "Mon, 12 Feb 2018 15:14:31 GMT"
+    }
+  },
+  "uuid" : "73298e32-a96a-4ef4-b1cf-9fc11d694570"
+}
