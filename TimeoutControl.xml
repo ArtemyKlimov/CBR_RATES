@@ -1,0 +1,10 @@
+<TimeoutRequest>
+<Identifier>AZON01</Identifier>
+<Action>SET</Action>
+<StartDate>TODAY</StartDate>
+<StartTime>NOW</StartTime>
+<Count>-1</Count>
+<Interval>3600</Interval>
+<IgnoreMissed>FALSE</IgnoreMissed>
+<AllowOverwrite>TRUE</AllowOverwrite>
+</TimeoutRequest>
