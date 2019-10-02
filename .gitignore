@@ -11,5 +11,4 @@ GeneratedBarFiles/
 **/.settings
 .DS_Store
 TestClientBarFiles
-*.jar
 !**/lib/*.jar
