@@ -20,7 +20,7 @@ CREATE COMPUTE MODULE ErrorHandler_ProcessError
 			PROPAGATE TO TERMINAL 'out1' MESSAGE InputRoot; --> Пробуем еще несколько раз вызвать сервис, если он временно недоступен
 			RETURN FALSE; 
 		END IF;
-		IF usrCode = '3002' OR  usrCode = '3003'THEN
+		IF usrCode = '3002' OR usrCode = '3003' OR usrCode = '3004' THEN
 			PROPAGATE TO TERMINAL 'out2' MESSAGE InputRoot;
 			RETURN FALSE; --Завершаем работу. Транзакцию откатывать не нужно
 		END IF;

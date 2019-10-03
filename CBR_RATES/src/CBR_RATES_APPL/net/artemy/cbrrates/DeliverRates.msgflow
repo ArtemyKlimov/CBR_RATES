@@ -16,7 +16,7 @@
       <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_2" location="160,93" logPath="/BROKER1/LOGS/CBR_RATES/DeliverRates_Enter.txt" level1Pattern="${CURRENT_TIMESTAMP} ${Root.MQMD.MsgId}" level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP} ${Root.MQMD.MsgId} ${Root.JSON.Data.Date} ${Root.JSON.Data.Currency}" level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
         <translation xmi:type="utility:ConstantString" string="EnterLog"/>
       </nodes>
-      <nodes xmi:type="common_ErrorHandler.subflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="150,162" ErrorQName="CBR_RATES.DELIVER_RATES.Q.ERR">
+      <nodes xmi:type="common_ErrorHandler.subflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="150,162" ErrorQName="CBR_RATES.DELIVER_RATES.Q.ERR" logPath="/BROKER1/LOGS/CBR_RATES/DeliverRates_Error.txt">
         <translation xmi:type="utility:ConstantString" string="ErrorHandler"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="255,93" computeExpression="esql://routine/net.artemy.cbrrates#DeliverRates_CreateWSRequest.Main" computeMode="destination">
