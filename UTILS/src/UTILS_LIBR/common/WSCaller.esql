@@ -4,8 +4,22 @@ BROKER SCHEMA common
 CREATE COMPUTE MODULE WSCaller_ProcessHTTPFailure
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		-- CALL CopyMessageHeaders();
-		-- CALL CopyEntireMessage();
+		THROW USER EXCEPTION MESSAGE 3002 VALUES ('TimeOut', 'Unable to establish connection with WebService', getHTTPFailureTrace(InputExceptionList),'', '');
 		RETURN TRUE;
+	END;
+	
+	CREATE FUNCTION getHTTPFailureTrace(IN ref REFERENCE) RETURNS CHARACTER
+	BEGIN
+		WHILE (FIELDNAME(ref) <> 'Insert')AND(LASTMOVE(ref)) DO
+			MOVE ref LASTCHILD;
+		END WHILE;
+	
+		MOVE ref PARENT;
+		MOVE ref PARENT;
+	
+		DECLARE errTrace CHARACTER '';
+		CALL getExceptionTrace(ref, errTrace);
+	
+		RETURN errTrace;
 	END;
 END MODULE;
