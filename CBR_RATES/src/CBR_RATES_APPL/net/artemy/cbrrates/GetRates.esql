@@ -14,6 +14,11 @@ CREATE COMPUTE MODULE GetRates_CreateWSRequest
 		DECLARE inRef REFERENCE TO InputRoot.JSON.Data;
 		DECLARE requestDate CHAR inRef.Date;
 		DECLARE lastCallDate CHAR COALESCE(RATES.ON_DATE, '');
+		IF LENGTH(requestDate) <> 10  OR LENGTH(REPLACE(requestDate, '-', '')) <> 8 THEN
+			SET Environment.Variables.Message = 'Невалидная дата в запросе' || COALESCE(': ' || requestDate, '') || '. Требуемый формат: ' || common.getWSDateFormat();
+			PROPAGATE TO LABEL 'FINISH';
+			RETURN FALSE; 
+		END IF;
 		IF lastCallDate <> '' AND lastCallDate = requestDate THEN
 			SET Environment.Variables.Message = 'Данные на ' || lastCallDate || ' уже были отправлены';
 			PROPAGATE TO LABEL 'FINISH';
@@ -72,6 +77,9 @@ END MODULE;
 CREATE COMPUTE MODULE GetRates_ProcessHTTPSuccess
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
+		IF NOT EXISTS(InputRoot.XMLNSC.*[]) THEN
+			THROW USER EXCEPTION MESSAGE 3003 VALUES ('Empty CRB Response');
+		END IF;
 		DECLARE inRef REFERENCE TO InputRoot.XMLNSC.SOAP_ENV_NS:Envelope.SOAP_ENV_NS:Body.*:GetCursOnDateXMLResponse.*:GetCursOnDateXMLResult;
 		DECLARE valueDateRef 		REFERENCE TO inRef.*:ValuteData;
 		DECLARE wsResultChar		CHAR valueDateRef.(XMLNSC.Attribute)"OnDate";

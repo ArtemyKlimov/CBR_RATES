@@ -19,19 +19,19 @@
       <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="415,155" queueName="TIMER_INIT.Q.ERR">
         <translation xmi:type="utility:ConstantString" string="MQOutError"/>
       </nodes>
-      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="278,27" queueName="TIMER_INIT_OUT.Q">
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="278,27" queueName="CBR_RATES.GET_RATES.Q">
         <translation xmi:type="utility:ConstantString" string="MQOut"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="162,26" computeExpression="esql://routine/net.artemy.timer#Initiator_CreateRequest.Main">
         <translation xmi:type="utility:ConstantString" string="CreateRequest"/>
       </nodes>
-      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="180,159">
+      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="180,159" logPath="/BROKER1/LOGS/TIMER/InitiatorEnter.txt" level1Pattern="${CURRENT_TIMESTAMP}" level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP}&#xD;&#xA;${Root}" level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
         <translation xmi:type="utility:ConstantString" string="InitTimerLog"/>
       </nodes>
-      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_9" location="534,159">
+      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_9" location="534,159" logPath="/BROKER1/LOGS/TIMER/InitiatorError.txt" level1Pattern="${CURRENT_TIMESTAMP}&#xD;&#xA;${ExceptionList}&#xD;&#xA;" level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP}&#xD;&#xA;${Root}&#xD;&#xA;${ExceptionList}" level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
         <translation xmi:type="utility:ConstantString" string="ErrorLog"/>
       </nodes>
-      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_10" location="413,31">
+      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_10" location="413,31" logPath="/BROKER1/LOGS/TIMER/InitiatorExit.txt" level1Pattern="${CURRENT_TIMESTAMP}&#xD;&#xA;${Root}" level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP} Date = ${Root.JSON.Data.Date}" level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
         <translation xmi:type="utility:ConstantString" string="ExitLog"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" targetNode="FCMComposite_1_8" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>

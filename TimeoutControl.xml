@@ -1,10 +1,10 @@
 <TimeoutRequest>
-<Identifier>AZON01</Identifier>
+<Identifier>CBRRTS</Identifier>
 <Action>SET</Action>
 <StartDate>TODAY</StartDate>
 <StartTime>NOW</StartTime>
 <Count>-1</Count>
-<Interval>3600</Interval>
+<Interval>86400</Interval>
 <IgnoreMissed>FALSE</IgnoreMissed>
 <AllowOverwrite>TRUE</AllowOverwrite>
 </TimeoutRequest>

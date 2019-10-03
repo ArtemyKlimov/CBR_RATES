@@ -17,8 +17,12 @@ CREATE COMPUTE MODULE ErrorHandler_ProcessError
 		IF backoutCount < MAX_RETRY_COUNT AND usrCode = '3002' THEN
 			DECLARE sleepSuccess BOOLEAN;
 			SET sleepSuccess = SLEEP(WS_REQUEST_DELAY * 1000);
-			PROPAGATE TO TERMINAL 'out1' MESSAGE InputRoot; -- retry
+			PROPAGATE TO TERMINAL 'out1' MESSAGE InputRoot; --> Пробуем еще несколько раз вызвать сервис, если он временно недоступен
 			RETURN FALSE; 
+		END IF;
+		IF usrCode = '3002' OR  usrCode = '3003'THEN
+			PROPAGATE TO TERMINAL 'out2' MESSAGE InputRoot;
+			RETURN FALSE; --Завершаем работу. Транзакцию откатывать не нужно
 		END IF;
 		IF backoutCount = MAX_RETRY_COUNT THEN
 			PROPAGATE TO TERMINAL 'out2' MESSAGE InputRoot;

@@ -40,7 +40,7 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="508,17" computeExpression="esql://routine/net.artemy.cbrrates#GetRates_SaveIntoCache.Main">
         <translation xmi:type="utility:ConstantString" string="SaveIntoCache"/>
       </nodes>
-      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_12" location="927,172" queueName="CBR_RATES.BUFFER.Q1" transactionMode="yes">
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_12" location="927,172" queueName="CBR_RATES.BUFFER.Q" transactionMode="yes">
         <translation xmi:type="utility:ConstantString" string="MQOutBuffer"/>
       </nodes>
       <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_13" location="659,98" queueName="CBR_RATES.DELIVER_RATES.Q" transactionMode="yes" persistenceMode="yes">
