@@ -8,9 +8,7 @@ CREATE COMPUTE MODULE GetRates_CreateWSRequest
 	DECLARE CBR_WS_URL EXTERNAL CHAR '';
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		IF NOT EXISTS(RATES.*[]) THEN
-			CALL GetLastCallRates();
-		END IF;
+		
 		DECLARE inRef REFERENCE TO InputRoot.JSON.Data;
 		DECLARE requestDate CHAR inRef.Date;
 		DECLARE lastCallDate CHAR COALESCE(RATES.ON_DATE, '');
@@ -18,6 +16,9 @@ CREATE COMPUTE MODULE GetRates_CreateWSRequest
 			SET Environment.Variables.Message = 'Невалидная дата в запросе' || COALESCE(': ' || requestDate, '') || '. Требуемый формат: ' || common.getWSDateFormat();
 			PROPAGATE TO LABEL 'FINISH';
 			RETURN FALSE; 
+		END IF;
+		IF NOT EXISTS(RATES.*[]) THEN
+			CALL GetLastCallRates();
 		END IF;
 		IF lastCallDate <> '' AND lastCallDate = requestDate THEN
 			SET Environment.Variables.Message = 'Данные на ' || lastCallDate || ' уже были отправлены';
@@ -205,5 +206,17 @@ CREATE COMPUTE MODULE GetRates_ProcessHTTPError
 		DECLARE faultstring CHARACTER inRef.faultstring;
 		THROW USER EXCEPTION MESSAGE 3004 VALUES(faultcode, faultstring);	
 		RETURN FALSE;
+	END;
+END MODULE;
+
+CREATE FILTER MODULE GetRates_IsJSON
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		IF EXISTS(Root.JSON.Data.*[]) THEN
+			RETURN TRUE;
+		ELSE
+			SET Environment.Variables.Message = 'Невалидный JSON';
+			RETURN FALSE;
+		END IF;
 	END;
 END MODULE;
