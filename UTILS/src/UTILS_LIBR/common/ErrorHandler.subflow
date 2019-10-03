@@ -14,6 +14,9 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.MAX_RETRY_COUNT" name="MAX_RETRY_COUNT" lowerBound="1" defaultValueLiteral="3">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.NEED_TRANSACTION_ROLLBACK" name="NEED_TRANSACTION_ROLLBACK" lowerBound="1">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
     <translation xmi:type="utility:TranslatableString" key="ErrorHandler" bundleName="common/ErrorHandler" pluginId="UTILS_LIBR"/>
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/UTILS_LIBR/icons/full/obj16/ErrorHandler.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/UTILS_LIBR/icons/full/obj30/ErrorHandler.gif"/>
@@ -27,7 +30,7 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="204,20" computeExpression="esql://routine/common#ErrorHandler_ProcessError.Main">
         <translation xmi:type="utility:ConstantString" string="ProcessError"/>
       </nodes>
-      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="320,108">
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="320,108" transactionMode="no">
         <translation xmi:type="utility:ConstantString" string="MQOutError"/>
       </nodes>
       <nodes xmi:type="ComIbmThrow.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="327,21" messageText="Throw exception to force rollback">
@@ -47,6 +50,9 @@
             <propertyName xmi:type="utility:TranslatableString" key="Property.WS_REQUEST_DELAY" bundleName="common/ErrorHandler" pluginId="UTILS_LIBR"/>
             <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.MAX_RETRY_COUNT">
               <propertyName xmi:type="utility:TranslatableString" key="Property.MAX_RETRY_COUNT" bundleName="common/ErrorHandler" pluginId="UTILS_LIBR"/>
+              <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.NEED_TRANSACTION_ROLLBACK">
+                <propertyName xmi:type="utility:TranslatableString" key="Property.NEED_TRANSACTION_ROLLBACK" bundleName="common/ErrorHandler" pluginId="UTILS_LIBR"/>
+              </propertyDescriptor>
             </propertyDescriptor>
           </propertyDescriptor>
         </propertyDescriptor>

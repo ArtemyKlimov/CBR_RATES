@@ -19,7 +19,7 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="232,100" computeExpression="esql://routine/net.artemy.cbrrates#GetRates_CreateWSRequest.Main" computeMode="destinationAndMessage">
         <translation xmi:type="utility:ConstantString" string="CreateWSRequest"/>
       </nodes>
-      <nodes xmi:type="common_ErrorHandler.subflow:FCMComposite_1" xmi:id="FCMComposite_1_5" location="128,175" ErrorQName="CBR_RATES.GET_RATES.Q.ERR" logPath="/BROKER1/LOGS/CBR_RATES/GetRates_Error.txt">
+      <nodes xmi:type="common_ErrorHandler.subflow:FCMComposite_1" xmi:id="FCMComposite_1_5" location="128,175" ErrorQName="CBR_RATES.GET_RATES.Q.ERR" logPath="/BROKER1/LOGS/CBR_RATES/GetRates_Error.txt" NEED_TRANSACTION_ROLLBACK="true">
         <translation xmi:type="utility:ConstantString" string="ErrorHandler"/>
       </nodes>
       <nodes xmi:type="common_WSCaller.subflow:FCMComposite_1" xmi:id="FCMComposite_1_6" location="372,101" MessageDomain="XMLNSC" HTTPError.logPath="/BROKER1/LOGS/CBR_RATES/GetRates_HTTPError.txt" HTTPFailure.logPath="/BROKER1/LOGS/CBR_RATES/GetRates_HTTPFailure.txt" HTTPSuccess.logPath="/BROKER1/LOGS/CBR_RATES/GetRates_HTTPSuccess.txt">
@@ -40,10 +40,10 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="508,17" computeExpression="esql://routine/net.artemy.cbrrates#GetRates_SaveIntoCache.Main">
         <translation xmi:type="utility:ConstantString" string="SaveIntoCache"/>
       </nodes>
-      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_12" location="927,172" queueName="CBR_RATES.BUFFER.Q">
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_12" location="927,172" queueName="CBR_RATES.BUFFER.Q1" transactionMode="yes">
         <translation xmi:type="utility:ConstantString" string="MQOutBuffer"/>
       </nodes>
-      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_13" location="659,98" queueName="CBR_RATES.DELIVER_RATES.Q" persistenceMode="yes">
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_13" location="659,98" queueName="CBR_RATES.DELIVER_RATES.Q" transactionMode="yes" persistenceMode="yes">
         <translation xmi:type="utility:ConstantString" string="MQOut"/>
       </nodes>
       <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_14" location="795,102" logPath="/BROKER1/LOGS/CBR_RATES/GetRates_Exit.txt" level1Pattern="${CURRENT_TIMESTAMP} ${Root.JSON.Data.Date}  ${Root.JSON.Data.Currency}" level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP} &#xD;&#xA;${Root.JSON}" level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
@@ -64,6 +64,9 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_18" location="792,171" computeExpression="esql://routine/net.artemy.cbrrates#GetRates_RenewCache.Main">
         <translation xmi:type="utility:ConstantString" string="RenewCache"/>
       </nodes>
+      <nodes xmi:type="common_Logger.subflow:FCMComposite_1" xmi:id="FCMComposite_1_19" location="134,25" logPath="/BROKER1/LOGS/CBR_RATES/GetRates_CriticalError.txt" level1Pattern="${CURRENT_TIMESTAMP} ${Root.MQMD.MsgId} " level1Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler" level2Pattern="${CURRENT_TIMESTAMP} ${Root.MQMD.MsgId} &#xD;&#xA;${Root}&#xD;&#xA;${ExceptionList}" level2Pattern.internal_npcompiler="com.ibm.etools.mft.ibmnodes.compilers.TracePatternPropertyCompiler">
+        <translation xmi:type="utility:ConstantString" string="CriticalErrorLog"/>
+      </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.Input"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.catch" targetTerminalName="InTerminal.Input"/>
@@ -82,6 +85,7 @@
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_12" targetNode="FCMComposite_1_18" sourceNode="FCMComposite_1_17" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_16" targetNode="FCMComposite_1_18" sourceNode="FCMComposite_1_17" sourceTerminalName="OutTerminal.noMessage" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_12" sourceNode="FCMComposite_1_18" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_19" targetNode="FCMComposite_1_19" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
     </composition>
     <propertyOrganizer>
       <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.CBR_WS_URL">
