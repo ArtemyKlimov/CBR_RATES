@@ -73,12 +73,14 @@ CREATE COMPUTE MODULE GetRates_ProcessHTTPSuccess
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		DECLARE inRef REFERENCE TO InputRoot.XMLNSC.SOAP_ENV_NS:Envelope.SOAP_ENV_NS:Body.*:GetCursOnDateXMLResponse.*:GetCursOnDateXMLResult;
-		DECLARE valueDateRef 	REFERENCE TO inRef.*:ValuteData;
-		DECLARE wsResultDate	CHAR valueDateRef.(XMLNSC.Attribute)"OnDate";
-		DECLARE onDate			CHAR CAST(CAST(wsResultDate AS DATE FORMAT 'yyyyMMdd') AS CHAR FORMAT common.getWSDateFormat());
-		DECLARE lastCallDate	CHAR COALESCE(RATES.ON_DATE, '');
+		DECLARE valueDateRef 		REFERENCE TO inRef.*:ValuteData;
+		DECLARE wsResultChar		CHAR valueDateRef.(XMLNSC.Attribute)"OnDate";
+		DECLARE wsResultDate		DATE CAST(wsResultChar AS DATE FORMAT 'yyyyMMdd');
+		DECLARE onDate				CHAR CAST(wsResultDate AS CHAR FORMAT common.getWSDateFormat());
+		DECLARE lastCallDate		CHAR COALESCE(RATES.ON_DATE, '');
+		
 		IF lastCallDate = onDate THEN
-			SET Environment.Variables.Message = 'Данные на ' || lastCallDate || ' уже были отправлены';
+			SET Environment.Variables.Message = 'Запрос курсов ЦБ на ' || Environment.Variables.RequestDate || '. Данные на ' || lastCallDate || ' уже были отправлены';
 			PROPAGATE TO LABEL 'FINISH';
 			RETURN FALSE;
 		END IF;
@@ -87,31 +89,46 @@ CREATE COMPUTE MODULE GetRates_ProcessHTTPSuccess
 		MOVE cursRef 			FIRSTCHILD TYPE XMLNSC.Element;
 		
 		IF LASTMOVE(cursRef) THEN
+			IF EXISTS(RATES.*[]) THEN
+				DECLARE lastCalLDateDate	DATE CAST(lastCallDate AS DATE FORMAT common.getWSDateFormat());
+				CALL SendRatesForPreviousDates(lastCalLDateDate, wsResultDate ); --> отправляем курсы за предыдущие дни
+			END IF;
 			CREATE LASTCHILD OF Environment.Variables NAME 'NewRates';
-			DECLARE newRatesRef REFERENCE TO Environment.Variables.NewRates;
+			DECLARE newRatesRef 	REFERENCE TO Environment.Variables.NewRates;
 			DECLARE tmpRef 			REFERENCE TO cursRef;
-			SET newRatesRef.ON_DATE		= onDate;
+			SET newRatesRef.ON_DATE	= onDate;
 			CREATE LASTCHILD OF newRatesRef NAME 'CURRENCIES';
 			WHILE LASTMOVE(cursRef) DO
 				CREATE LASTCHILD OF newRatesRef.CURRENCIES AS tmpRef NAME 'ITEM';
 				DECLARE rate		CHAR CASE COALESCE(cursRef.Vnom, '') WHEN '' THEN cursRef.Vcurs WHEN '0' THEN cursRef.Vcurs ELSE CAST(ROUND(CAST(cursRef.Vcurs AS DECIMAL) / CAST(cursRef.Vnom AS INT), 5) AS CHAR) END;
 				CALL SendOutMessage(onDate ,cursRef.VchCode, rate);
 				SET tmpRef.NAME 	= cursRef.VchCode;
-				SET tmpRef.Value 	= rate;
+				SET tmpRef.VALUE 	= rate;
 				MOVE cursRef NEXTSIBLING NAME 'ValuteCursOnDate';
 			END WHILE;
 			--После отправки всех курсов обновляем буффер и кэш
 			MOVE newRatesRef TO Environment.Variables.NewRates;
 			CALL RenewBufferMessage(newRatesRef);
-			
-
 		ELSE 
-			SET Environment.Variables.Message = 'Данные за ' || onDate || ' не были предоставлены ЦБ';
+			SET Environment.Variables.Message = 'Данные на ' || onDate || ' не были предоставлены ЦБ';
 			PROPAGATE TO LABEL 'FINISH';
 		END IF;
 		RETURN FALSE;
 	END;
 	
+	CREATE PROCEDURE SendRatesForPreviousDates(IN lastCalLDateDate DATE, IN wsResultDate DATE)
+	BEGIN				
+		DECLARE tmpDate			DATE lastCalLDateDate + INTERVAL '1' DAY;
+		WHILE tmpDate < wsResultDate DO
+			DECLARE oldRatesRef REFERENCE TO RATES.CURRENCIES;
+			MOVE oldRatesRef FIRSTCHILD;
+			WHILE LASTMOVE(oldRatesRef) DO
+				CALL SendOutMessage(CAST(tmpDate AS CHAR FORMAT common.getWSDateFormat()), oldRatesRef.NAME, oldRatesRef.VALUE);
+				MOVE oldRatesRef NEXTSIBLING;
+			END WHILE;
+			SET tmpDate = tmpDate + INTERVAL '1' DAY;
+		END WHILE;	
+	END;
 	
 	CREATE PROCEDURE RenewBufferMessage(IN newRatesRef REFERENCE)
 	BEGIN
@@ -151,6 +168,7 @@ CREATE COMPUTE MODULE GetRates_RenewCache
 		PROPAGATE TO TERMINAL 'out1';
 		SET RATES VALUE = NULL;
 		SET RATES = newRatesRef;
+		RETURN FALSE;
 	END;
 
 END MODULE;
