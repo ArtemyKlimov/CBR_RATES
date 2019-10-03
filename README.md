@@ -8,6 +8,7 @@
 - IBM WebSphere Message Broker не ниже 9.0.0.7
 - права администратора (для Windows) или пользователь в группах mqm, mqbrkrs для Linux
 - возможность запуска mqsiprofile
+- установлена JRE и прописана переменная среды JAVA_HOME (для Wiremock)
 
 **Фаза инсталляции:**
 - создать директории для записи Trace-файлов 
@@ -43,5 +44,6 @@ C:\BROKER1\LOGS\CBR_RATES, C:\BROKER1\LOGS\TIMER (для Windows)
 | Interval|86400|Интервал в сек. между срабатыванием таймера |
 | AllowOverwrite|TRUE|Смогут ли последующие сообщения перезаписывать настройки |
 
+- запустить заглушку веб-сервиса сохнанения курсов: запустить скрипт MOCKS\runwiremock.bat (на Windows) или MOCKS\runwiremock.sh (на Linux), выполнив перед этим команду ```$ chmod +x MOCKS/runwiremock.sh```. Логи вызова сервиса будут доступны по адресу http://localhost:22223/__admin/requests
 - для получения курса в обход таймера, поместить тестовое сообщение из файла TestMessage.txt в очередь scripts/putTestMessage.bat или scripts/putTestMessage.sh. На Linux сделать файл исполняемым при помощи команды ```$ chmod +x scripts/putTestMessage.sh```
 

@@ -1,5 +1,5 @@
 echo "starting"
-BRKNAME=BROKER1
+BRKNAME=BRK01
 QPREFIX=TIMER1
 TIMER_SC=TIMER1
 echo "creating a Timer configurable service for broker $BRKNAME, timer $TIMER_SC with $QPREFIX prefix"
