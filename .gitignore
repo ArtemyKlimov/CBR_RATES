@@ -1,7 +1,5 @@
 **/.metadata/
-**/BARfiles/
 **/GeneratedBarFiles/
-BARfiles
 **/bin/
 *.class
 GeneratedBarFiles/
