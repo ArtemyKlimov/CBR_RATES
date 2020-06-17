@@ -1,0 +1,23 @@
+{
+	"id" : "a3298e32-a96a-4ef4-b1cf-9fc11d684570",
+    "request": {
+	
+        "method": "POST",
+        "url": "/dev/SOAP/SomeService/SOAP",
+	"bodyPatterns": [
+	{
+		"matchesXPath": "/S:Envelope/S:Body/ns3:SomeServiceNamespace/inParms/cus[.='CLIENT']",
+		"xPathNamespaces": {
+			"S": "http://schemas.xmlsoap.org/soap/envelope/",
+			"ns3": "http://Someservice"
+		}
+	}
+	]}
+
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "OK_POST_Response.xml"
+    },
+    "uuid" : "a3298e32-a96a-4ef4-b1cf-9fc11d684570"
+}
